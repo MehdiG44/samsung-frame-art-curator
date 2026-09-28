@@ -1,0 +1,208 @@
+<meta charset="utf-8">
+<title>__TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Karla:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#0f1114; --panel:#171a1f; --line:#262a31; --ink:#ece7dd; --mute:#8d919a;
+  --ai:#86a5d2; --iznik:#52b6ab; --remove:#e0654f; --remove-bg:rgba(224,101,79,.14);
+  --display:"Shippori Mincho","Hiragino Mincho ProN","Times New Roman",serif;
+  --body:"Karla",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body);padding-inline:clamp(16px,4vw,48px);padding-block:0 64px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);margin-inline:calc(-1*clamp(16px,4vw,48px));padding:12px clamp(16px,4vw,48px);border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.brand{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.01em;margin-right:auto}
+.brand small{display:block;font-family:var(--body);font-weight:500;font-size:12px;color:var(--mute);letter-spacing:.02em}
+.tally{font-variant-numeric:tabular-nums;font-size:14px;color:var(--mute)}
+.tally b{color:var(--ink);font-weight:700}
+.tally .rm b{color:var(--remove)}
+.seg{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{all:unset;cursor:pointer;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:500;color:var(--mute)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.seg button:focus-visible,.btn:focus-visible,.tile:focus-visible,.zoom:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
+.btn{all:unset;cursor:pointer;font-size:13px;font-weight:500;padding:6px 12px;border:1px solid var(--line);border-radius:8px;color:var(--ink)}
+.btn:hover{border-color:var(--mute)}
+.intro{max-width:62ch;margin:28px 0 8px;color:var(--mute)}
+.intro strong{color:var(--ink);font-weight:500}
+.sync{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--mute);margin-bottom:12px}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--mute)}
+.sync[data-state="live"] i{background:var(--iznik)}
+.sync[data-state="local"] i{background:#d8a64a}
+.region{margin-top:40px}
+.region h2{font-family:var(--display);font-weight:700;font-size:clamp(26px,4vw,36px);line-height:1.1;margin:0 0 4px;text-wrap:balance}
+.region h2 span{color:var(--acc)}
+.region > p{margin:0;color:var(--mute);font-size:14px}
+section.type{margin-top:28px}
+.type header{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.code{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:2px 6px;border-radius:4px;border:1px solid currentColor}
+.region .code{color:var(--acc)}
+.type h3{margin:0;font-size:17px;font-weight:700}
+.type .src{color:var(--mute);font-size:13px}
+.type .cnt{margin-left:auto;font-variant-numeric:tabular-nums;font-size:13px;color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:10px}
+.tile{position:relative;display:block;aspect-ratio:16/9;max-width:100%;border-radius:4px;overflow:hidden;cursor:pointer;background:var(--panel)}
+.tile img{width:100%;height:100%;object-fit:cover;display:block;transition:filter .2s,opacity .2s,transform .3s}
+.tile:hover img{transform:scale(1.02)}
+.tile .chip{position:absolute;left:8px;bottom:8px;font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--remove);color:#fff}
+.tile.removed img{filter:grayscale(1) brightness(.45)}
+.tile.removed{outline:2px solid var(--remove);outline-offset:-2px}
+.zoom{all:unset;cursor:zoom-in;position:absolute;right:6px;top:6px;width:30px;height:30px;border-radius:6px;background:rgba(0,0,0,.5);display:grid;place-items:center;opacity:.8}
+.zoom svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+.tile:hover .zoom{opacity:1}
+.empty{color:var(--mute);font-size:14px;margin-top:40px}
+dialog{border:0;padding:0;background:#000;max-width:100vw;max-height:100vh;width:100vw;height:100vh;color:var(--ink)}
+dialog::backdrop{background:#000}
+.lb{height:100%;display:grid;grid-template-rows:1fr auto}
+.lb img{width:100%;height:100%;object-fit:contain;min-height:0}
+.lb .bar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:#0b0c0e;flex-wrap:wrap}
+.lb .bar .who{font-size:13px;color:var(--mute)}
+.lb .toggle[data-removed="true"]{background:var(--remove-bg);border-color:var(--remove);color:var(--remove)}
+@media (prefers-reduced-motion:reduce){.tile img{transition:none}.tile:hover img{transform:none}}
+</style>
+
+<header class="top">
+  <div class="brand">__TITLE__<small>__SUBTITLE__</small></div>
+  <div class="tally"><b id="kept">0</b> going on the TV · <span class="rm"><b id="rm">0</b> removed</span></div>
+  <div class="seg" role="group" aria-label="Filter">
+    <button type="button" data-f="new" aria-pressed="true">To review</button>
+    <button type="button" data-f="all" aria-pressed="false">All</button>
+    <button type="button" data-f="rm" aria-pressed="false">Removed</button>
+  </div>
+  <button type="button" class="btn" id="copy">Copy removed list</button>
+</header>
+
+<p class="intro"><strong>Only what you haven't seen yet.</strong> <strong>Tap a picture to take it out.</strong> Everything you leave in goes on the TV in shuffle. Tap again to bring one back. Use the corner icon to see it large.</p>
+<div class="sync" id="sync" data-state="wait"><i></i><span id="syncText">Connecting…</span></div>
+
+<main id="main"></main>
+
+<dialog id="lb" aria-label="Large view">
+  <div class="lb">
+    <img id="lbImg" alt="">
+    <div class="bar">
+      <button type="button" class="btn" id="lbPrev">← Prev</button>
+      <span class="who" id="lbWho"></span>
+      <button type="button" class="btn toggle" id="lbToggle">Remove</button>
+      <button type="button" class="btn" id="lbNext">Next →</button>
+      <button type="button" class="btn" id="lbClose">Close</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+const GROUPS = /*__DATA__*/null;
+const REGION = /*__REGIONS__*/null;
+const ACCENTS = ['--ai', '--iznik'];
+const removed = new Set();
+const SEEN = new Set(GROUPS.flatMap(g => g.seen || []));
+let filter = GROUPS.some(g => g.ids.some(id => !SEEN.has(id))) ? 'new' : 'all', db = null, order = [];
+const LS = 'frame-review-removed';
+try { JSON.parse(localStorage.getItem(LS) || '[]').forEach(id => removed.add(id)); } catch (e) {}
+const saveLocal = () => { try { localStorage.setItem(LS, JSON.stringify([...removed])); } catch (e) {} };
+
+const zoomSvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>';
+function build() {
+  const main = document.getElementById('main');
+  const seg = document.querySelector('.seg'), rmBtn = seg.querySelector('[data-f="rm"]');
+  Object.keys(REGION).forEach((r, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.dataset.f = r; b.setAttribute('aria-pressed', 'false'); b.textContent = REGION[r].title; seg.insertBefore(b, rmBtn);
+  });
+  Object.keys(REGION).forEach((r, i) => {
+    const reg = document.createElement('div'); reg.className = 'region'; reg.dataset.r = r;
+    reg.style.setProperty('--acc', `var(${ACCENTS[i % ACCENTS.length]})`);
+    reg.innerHTML = `<h2></h2><p></p>`;
+    reg.querySelector('h2').textContent = REGION[r].title + ' ';
+    if (REGION[r].accent) { const s = document.createElement('span'); s.textContent = '· ' + REGION[r].accent; reg.querySelector('h2').appendChild(s); }
+    reg.querySelector('p').textContent = REGION[r].blurb;
+    for (const g of GROUPS.filter(g => g.code[0] === r)) {
+      const s = document.createElement('section'); s.className = 'type'; s.dataset.code = g.code;
+      s.innerHTML = `<header><span class="code">${g.code}</span><h3></h3><span class="src"></span><span class="cnt"></span></header><div class="grid"></div>`;
+      s.querySelector('h3').textContent = g.label; s.querySelector('.src').textContent = g.src;
+      const grid = s.querySelector('.grid');
+      for (const id of g.ids) {
+        order.push(id);
+        const t = document.createElement('div'); t.className = 'tile'; t.tabIndex = 0; t.dataset.id = id; t.setAttribute('role','button');
+        t.setAttribute('aria-label', `${g.label}, picture ${g.ids.indexOf(id)+1}`);
+        t.innerHTML = `<img loading="lazy" decoding="async" alt="" src="thumbs/${id}.jpg"><button type="button" class="zoom" aria-label="See large">${zoomSvg}</button><span class="chip" hidden>Removed</span>`;
+        grid.appendChild(t);
+      }
+      reg.appendChild(s);
+    }
+    main.appendChild(reg);
+  });
+  const e = document.createElement('p'); e.className = 'empty'; e.id = 'empty'; e.hidden = true; e.textContent = 'Nothing removed yet.'; main.appendChild(e);
+  main.addEventListener('click', ev => {
+    const tile = ev.target.closest('.tile'); if (!tile) return;
+    if (ev.target.closest('.zoom')) { openLb(tile.dataset.id); return; }
+    toggle(tile.dataset.id);
+  });
+  main.addEventListener('keydown', ev => { const t = ev.target.closest('.tile'); if (t && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); toggle(t.dataset.id); } });
+}
+function paint() {
+  document.querySelectorAll('.tile').forEach(t => {
+    const r = removed.has(t.dataset.id); t.classList.toggle('removed', r); t.querySelector('.chip').hidden = !r; t.setAttribute('aria-pressed', r);
+    t.hidden = (filter === 'rm' && !r) || (filter === 'new' && SEEN.has(t.dataset.id));
+  });
+  document.querySelectorAll('section.type').forEach(s => {
+    const tiles = [...s.querySelectorAll('.tile')], n = tiles.filter(t => !removed.has(t.dataset.id)).length;
+    s.querySelector('.cnt').textContent = `${n} of ${tiles.length} kept`;
+    s.hidden = (filter === 'rm' && !tiles.some(t => !t.hidden)) || (filter in REGION && s.dataset.code[0] !== filter);
+    if (filter === 'new' && !tiles.some(t => !t.hidden)) s.hidden = true;
+  });
+  document.querySelectorAll('.region').forEach(r => r.hidden = ![...r.querySelectorAll('section.type')].some(s => !s.hidden));
+  document.getElementById('empty').hidden = !(filter === 'rm' && removed.size === 0);
+  document.getElementById('rm').textContent = removed.size;
+  document.getElementById('kept').textContent = order.length - [...removed].filter(id => order.includes(id)).length;
+  if (lbId) syncLb();
+}
+async function toggle(id) {
+  const now = !removed.has(id);
+  now ? removed.add(id) : removed.delete(id); saveLocal(); paint();
+  if (!db) return;
+  try { const ref = db.doc('removed/' + id); now ? await ref.set({removed: true, at: new Date().toISOString()}) : await ref.delete(); }
+  catch (e) { setSync('local', 'Not saved online. Use “Copy removed list” and paste it to your assistant.'); }
+}
+function setSync(state, text) { const s = document.getElementById('sync'); s.dataset.state = state; document.getElementById('syncText').textContent = text; }
+document.querySelector('.seg').addEventListener('click', ev => { const b = ev.target.closest('button'); if (!b) return;
+  filter = b.dataset.f; document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b)); paint();
+});
+document.getElementById('copy').addEventListener('click', async ev => {
+  const txt = [...removed].sort().join('\n') || '(nothing removed)';
+  try { await navigator.clipboard.writeText(txt); ev.target.textContent = 'Copied'; }
+  catch (e) { ev.target.textContent = `${removed.size} removed: ` + [...removed].join(', '); }
+  setTimeout(() => ev.target.textContent = 'Copy removed list', 2500);
+});
+// lightbox
+const lb = document.getElementById('lb'); let lbId = null;
+function openLb(id) { lbId = id; syncLb(); if (!lb.open) lb.showModal(); }
+function syncLb() {
+  document.getElementById('lbImg').src = `thumbs/${lbId}.jpg`;
+  const g = GROUPS.find(g => g.ids.includes(lbId));
+  document.getElementById('lbWho').textContent = `${g.code} · ${g.label} · ${g.ids.indexOf(lbId)+1}/${g.ids.length}`;
+  const b = document.getElementById('lbToggle'), r = removed.has(lbId);
+  b.dataset.removed = r; b.textContent = r ? 'Removed · tap to keep' : 'Remove';
+}
+const step = d => { const i = order.indexOf(lbId); lbId = order[(i + d + order.length) % order.length]; syncLb(); };
+document.getElementById('lbPrev').onclick = () => step(-1);
+document.getElementById('lbNext').onclick = () => step(1);
+document.getElementById('lbToggle').onclick = () => toggle(lbId);
+document.getElementById('lbClose').onclick = () => lb.close();
+lb.addEventListener('close', () => lbId = null);
+lb.addEventListener('keydown', e => { if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); if (e.key === 'x') toggle(lbId); });
+
+build();
+document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x.dataset.f === filter));
+paint();
+(async () => {
+  db = await window.claude?.use?.('db').catch(() => null) ?? null;
+  if (!db) { setSync('local', 'Saved on this device only. Use “Copy removed list” and paste it to your assistant.'); return; }
+  setSync('live', 'Saved live. Your assistant sees your choices.');
+  db.collection('removed').onSnapshot(snap => {
+    removed.clear(); snap.docs.forEach(d => removed.add(d.id)); saveLocal(); paint();
+  }, () => setSync('local', 'Lost the connection. Your taps are kept on this device.'));
+})();
+</script>
