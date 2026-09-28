@@ -20,8 +20,8 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .tally{font-variant-numeric:tabular-nums;font-size:14px;color:var(--mute)}
 .tally b{color:var(--ink);font-weight:700}
 .tally .rm b{color:var(--remove)}
-.seg{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px}
-.seg button{all:unset;cursor:pointer;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:500;color:var(--mute)}
+.seg{display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{all:unset;cursor:pointer;white-space:nowrap;flex:none;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:500;color:var(--mute)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .seg button:focus-visible,.btn:focus-visible,.tile:focus-visible,.zoom:focus-visible{outline:2px solid var(--ai);outline-offset:2px}
 .btn{all:unset;cursor:pointer;font-size:13px;font-weight:500;padding:6px 12px;border:1px solid var(--line);border-radius:8px;color:var(--ink)}
@@ -61,6 +61,7 @@ dialog::backdrop{background:#000}
 .lb .bar{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:#0b0c0e;flex-wrap:wrap}
 .lb .bar .who{font-size:13px;color:var(--mute)}
 .lb .toggle[data-removed="true"]{background:var(--remove-bg);border-color:var(--remove);color:var(--remove)}
+@media (max-width:600px){header.top{gap:8px 12px}.brand small{display:none}.tally{font-size:13px}#copy{display:none}}
 @media (prefers-reduced-motion:reduce){.tile img{transition:none}.tile:hover img{transform:none}}
 </style>
 
