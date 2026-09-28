@@ -18,7 +18,7 @@
   frame.py thumbs OUTDIR [IDS]              save thumbnails
 
 TV address: $FRAME_TV_HOST, else ~/.config/frame-tv/host (written by `discover` when it finds exactly one Frame).
-FRAME_ART_DIR: project dir holding uploaded.json (default ~/code/frame-art).
+Project dir (holds uploaded.json): $FRAME_ART_DIR, else ~/.config/frame-tv/project, else ~/frame-tv-art.
 Token: ~/.config/frame-tv/token.txt (first connection may show an Allow prompt on the TV).
 Safety: the state file (uploaded.json) is the only list of images this tool may delete without --force.
 """
@@ -32,7 +32,12 @@ def _host():
     except FileNotFoundError: return None
 HOST = _host()
 TOKEN = os.path.expanduser('~/.config/frame-tv/token.txt')
-STATE = os.path.join(os.environ.get('FRAME_ART_DIR', os.path.expanduser('~/code/frame-art')), 'uploaded.json')
+def project_dir():
+    """$FRAME_ART_DIR, else ~/.config/frame-tv/project, else ~/frame-tv-art."""
+    if os.environ.get('FRAME_ART_DIR'): return os.path.expanduser(os.environ['FRAME_ART_DIR'])
+    try: return os.path.expanduser(open(os.path.expanduser('~/.config/frame-tv/project')).read().strip())
+    except FileNotFoundError: return os.path.expanduser('~/frame-tv-art')
+STATE = os.path.join(project_dir(), 'uploaded.json')
 MY, FAV = 'MY-C0002', 'MY-C0004'
 
 def load_state():
@@ -170,7 +175,10 @@ async def cmd_thumbs(tv, args):
     print(len(ids), 'thumbnails in', out)
 
 def discover():
-    me = subprocess.run(['ipconfig', 'getifaddr', 'en0'], capture_output=True, text=True).stdout.strip()
+    import socket
+    sk = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try: sk.connect(('10.255.255.255', 1)); me = sk.getsockname()[0]   # no packet is sent; picks the LAN interface
+    finally: sk.close()
     net = me.rsplit('.', 1)[0]
     def probe(i):
         try:

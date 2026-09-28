@@ -1,10 +1,15 @@
 """Build <project>/review/index.html + review/thumbs/*.jpg from <project>/stage/final/<TYPE>/*.jpg.
-Project dir: $FRAME_ART_DIR or ~/code/frame-art.
+Project dir: $FRAME_ART_DIR, else ~/.config/frame-tv/project, else ~/frame-tv-art.
 <project>/types.json: [[code, label, source note, kind], ...]; the first letter of a code is its region.
 <project>/regions.json (optional): {"title": str, "subtitle": str, "regions": {"J": {"title","accent","blurb"}}}."""
 import os, re, json, glob, subprocess, concurrent.futures as cf
 HERE = os.path.dirname(os.path.realpath(__file__))
-os.chdir(os.environ.get("FRAME_ART_DIR", os.path.expanduser("~/code/frame-art")))
+def project_dir():
+    """$FRAME_ART_DIR, else ~/.config/frame-tv/project, else ~/frame-tv-art."""
+    if os.environ.get('FRAME_ART_DIR'): return os.path.expanduser(os.environ['FRAME_ART_DIR'])
+    try: return os.path.expanduser(open(os.path.expanduser('~/.config/frame-tv/project')).read().strip())
+    except FileNotFoundError: return os.path.expanduser('~/frame-tv-art')
+os.chdir(project_dir())
 rows = json.load(open('types.json'))
 types = {r[0]: r[1] for r in rows}
 SRC = {r[0]: r[2] for r in rows if len(r) > 2 and r[2]}

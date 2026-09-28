@@ -2,7 +2,9 @@
 usage: render.py <mode> <out_dir> <files...>   mode: photo | print | anime
 print: shaves paper margins first; anime: 2x AI upscale first; small art gets 4x AI upscale."""
 import os, sys, subprocess, tempfile, threading, concurrent.futures as cf
-ESR = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'esr')
+ESR = next((p for p in (os.environ.get('FRAME_ESR_DIR', ''), os.path.expanduser('~/.local/share/frame-tv/esr'),
+            os.path.join(os.path.dirname(os.path.realpath(__file__)), 'esr')) if p and os.path.isdir(p)),
+           os.path.expanduser('~/.local/share/frame-tv/esr'))
 W, H = 3840, 2160
 # The GPU upscaler is the heavy part: two at once on big scans is what froze the Mac. One at a time, always;
 # the CPU-side crop/encode can run in parallel around it.
